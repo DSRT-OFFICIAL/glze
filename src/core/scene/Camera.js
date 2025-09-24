@@ -1,41 +1,35 @@
-import { Vector3 } from './Vector3.js';
-import { Matrix4 } from './Matrix4.js';
+// src/core/Camera.js
+import { Object3D } from './Object3D.js';
+import { Matrix4 } from './math/Matrix4.js';
 
-export class Camera {
-    constructor(fov=60, aspect=1, near=0.1, far=1000) {
-        this.position = new Vector3();
-        this.rotation = new Vector3();
-        this.up = new Vector3(0,1,0);
+export class Camera extends Object3D {
+  constructor(fov=60, aspect=1, near=0.1, far=1000) {
+    super();
+    this.fov = fov;
+    this.aspect = aspect;
+    this.near = near;
+    this.far = far;
 
-        this.fov = fov;
-        this.aspect = aspect;
-        this.near = near;
-        this.far = far;
+    this.projectionMatrix = new Matrix4();
+    this.updateProjectionMatrix();
+  }
 
-        this.matrix = new Matrix4();
-        this.matrixWorld = new Matrix4();
-        this.projectionMatrix = new Matrix4();
+  updateProjectionMatrix() {
+    const top = this.near * Math.tan(0.5 * this.fov * Math.PI/180);
+    const height = 2 * top;
+    const width = this.aspect * height;
+    const left = -0.5 * width;
+    const right = 0.5 * width;
+    const bottom = -0.5 * height;
 
-        this.viewport = { x:0, y:0, width:1, height:1 };
-        this.renderTarget = null;
-        this.controls = null; // optional OrbitControls or custom
-    }
+    this.projectionMatrix.makePerspective(left, right, top, bottom, this.near, this.far);
+  }
 
-    lookAt(target) {
-        // compute rotation from current position to target
-    }
-
-    updateProjectionMatrix() {
-        const f = 1.0 / Math.tan((this.fov * 0.5) * (Math.PI / 180));
-        this.projectionMatrix.elements = [
-            f / this.aspect, 0, 0, 0,
-            0, f, 0, 0,
-            0, 0, (this.far+this.near)/(this.near-this.far), (2*this.far*this.near)/(this.near-this.far),
-            0, 0, -1, 0
-        ];
-    }
-
-    updateMatrixWorld(force=false) {
-        // compute world matrix from position, rotation
-    }
+  lookAt(target) {
+    // Membuat view matrix sederhana
+    const z = this.position.clone().subtract(target).normalize();
+    const x = new Vector3(0,1,0).cross(z).normalize();
+    const y = z.clone().cross(x);
+    this.matrixWorld.setBasis(x,y,z,this.position);
+  }
 }
