@@ -1,39 +1,54 @@
-import { Object3D } from '../core/Object3D.js';
+// src/core/Scene.js
+import { Object3D } from './Object3D.js';
 
 export class Scene extends Object3D {
-    constructor() {
-        super();
-        this.background = null;           // Color, Texture, CubeTexture
-        this.fog = null;                  // Fog
-        this.overrideMaterial = null;
-        this.autoUpdate = true;
-        this.matrixWorldAutoUpdate = true;
-        this.lights = [];
-        this.renderQueue = [];
-        this.userData = {};               // Additional custom properties
-    }
+  constructor() {
+    super();
+    this.type = 'Scene';
+    this.background = null;
+    this.environment = null;
+    this.fog = null;
+    this.overrideMaterial = null;
+    this.autoUpdate = true;
+    this.matrixWorldNeedsUpdate = false;
 
-    addLight(light) {
-        this.lights.push(light);
-    }
+    // Tambahan GLAZE: menyimpan semua mesh, camera, dan light
+    this.meshes = [];
+    this.cameras = [];
+    this.lights = [];
+    this.activeCamera = null;
+  }
 
-    addToRenderQueue(obj) {
-        this.renderQueue.push(obj);
-    }
+  add(object) {
+    super.add(object);
+    if(object.isMesh) this.meshes.push(object);
+    if(object.isLight) this.lights.push(object);
+    if(object.isCamera) this.cameras.push(object);
+  }
 
-    removeFromRenderQueue(obj) {
-        const index = this.renderQueue.indexOf(obj);
-        if(index >= 0) this.renderQueue.splice(index, 1);
-    }
+  setActiveCamera(camera) {
+    if(this.cameras.includes(camera)) this.activeCamera = camera;
+  }
 
-    copy(source, recursive = true) {
-        super.copy(source, recursive);
-        this.background = source.background;
-        this.fog = source.fog;
-        this.overrideMaterial = source.overrideMaterial;
-        this.lights = [...source.lights];
-        this.renderQueue = [...source.renderQueue];
-        this.userData = { ...source.userData };
-        return this;
+  render(renderer) {
+    if(this.background) renderer.clear(this.background);
+    if(this.activeCamera) {
+      for(const mesh of this.meshes) {
+        renderer.renderMesh(mesh, this.activeCamera);
+      }
     }
+  }
+
+  copy(source, recursive = true) {
+    super.copy(source, recursive);
+    this.background = source.background;
+    this.environment = source.environment;
+    this.fog = source.fog;
+    this.overrideMaterial = source.overrideMaterial;
+    this.meshes = [...source.meshes];
+    this.cameras = [...source.cameras];
+    this.lights = [...source.lights];
+    this.activeCamera = source.activeCamera;
+    return this;
+  }
 }
