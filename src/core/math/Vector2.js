@@ -1,109 +1,44 @@
 export class Vector2 {
-  constructor(x=0, y=0) {
+  constructor(x=0, y=0){
     this.x = x;
     this.y = y;
   }
 
-  // Set values
-  set(x, y) {
-    this.x = x; this.y = y;
+  // set, copy, clone
+  set(x,y){ this.x=x; this.y=y; return this; }
+  copy(v){ this.x=v.x; this.y=v.y; return this; }
+  clone(){ return new Vector2(this.x,this.y); }
+
+  // operasi in-place
+  add(v){ this.x+=v.x; this.y+=v.y; return this; }
+  sub(v){ this.x-=v.x; this.y-=v.y; return this; }
+  multiplyScalar(s){ this.x*=s; this.y*=s; return this; }
+  divideScalar(s){ if(s!==0){ this.x/=s; this.y/=s; } return this; }
+
+  // utility
+  length(){ return Math.hypot(this.x,this.y); }
+  lengthSquared(){ return this.x*this.x + this.y*this.y; }
+  normalize(){ let l=this.length()||1; this.x/=l; this.y/=l; return this; }
+  dot(v){ return this.x*v.x + this.y*v.y; }
+  setZero(){ this.x=0; this.y=0; return this; }
+
+  // functional style
+  added(v){ return this.clone().add(v); }
+  subtracted(v){ return this.clone().sub(v); }
+  scaled(s){ return this.clone().multiplyScalar(s); }
+
+  // lerp
+  lerp(v, t){
+    this.x += (v.x-this.x)*t;
+    this.y += (v.y-this.y)*t;
     return this;
   }
 
-  // Copy from another vector
-  copy(v) {
-    this.x = v.x; this.y = v.y;
-    return this;
-  }
+  // conversion array
+  toArray(){ return [this.x,this.y]; }
+  fromArray(arr, offset=0){ this.x=arr[offset]; this.y=arr[offset+1]; return this; }
 
-  // Clone vector
-  clone() {
-    return new Vector2(this.x, this.y);
-  }
-
-  // Add another vector (return new vector)
-  add(v) {
-    return new Vector2(this.x + v.x, this.y + v.y);
-  }
-
-  // Add in-place
-  addInPlace(v) {
-    this.x += v.x; this.y += v.y;
-    return this;
-  }
-
-  // Subtract (return new vector)
-  subtract(v) {
-    return new Vector2(this.x - v.x, this.y - v.y);
-  }
-
-  // Subtract in-place
-  subtractInPlace(v) {
-    this.x -= v.x; this.y -= v.y;
-    return this;
-  }
-
-  // Multiply by scalar
-  multiplyScalar(s) {
-    return new Vector2(this.x * s, this.y * s);
-  }
-
-  // Multiply per-component
-  multiplyComponents(v) {
-    return new Vector2(this.x * v.x, this.y * v.y);
-  }
-
-  // In-place multiply per-component
-  multiplyComponentsInPlace(v) {
-    this.x *= v.x; this.y *= v.y;
-    return this;
-  }
-
-  // Divide by scalar
-  divideScalar(s) {
-    if (s !== 0) return this.multiplyScalar(1 / s);
-    console.warn("Vector2.divideScalar: division by zero");
-    return this.clone();
-  }
-
-  // Dot product
-  dot(v) {
-    return this.x * v.x + this.y * v.y;
-  }
-
-  // Length / magnitude
-  length() {
-    return Math.hypot(this.x, this.y);
-  }
-
-  // Normalize
-  normalize() {
-    const l = this.length() || 1;
-    this.x /= l; this.y /= l;
-    return this;
-  }
-
-  // Linear interpolation
-  lerp(v, t) {
-    this.x += (v.x - this.x) * t;
-    this.y += (v.y - this.y) * t;
-    return this;
-  }
-
-  // Convert to array
-  toArray() {
-    return [this.x, this.y];
-  }
-
-  // Load from array
-  fromArray(arr) {
-    this.x = arr[0] || 0;
-    this.y = arr[1] || 0;
-    return this;
-  }
-
-  // String representation
-  toString() {
-    return `Vector2(${this.x}, ${this.y})`;
-  }
+  // debug
+  toString(){ return `Vector2(${this.x},${this.y})`; }
+  equals(v, epsilon=1e-6){ return Math.abs(this.x-v.x)<epsilon && Math.abs(this.y-v.y)<epsilon; }
 }
