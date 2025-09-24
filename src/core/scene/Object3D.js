@@ -1,43 +1,76 @@
+// src/core/Object3D.js
+import { Matrix4 } from './math/Matrix4.js';
+import { Vector3 } from './math/Vector3.js';
+import { Quaternion } from './math/Quaternion.js';
+import { Euler } from './math/Euler.js';
+
 export class Object3D {
-    constructor(name='') {
-        this.name = name;
-        this.position = { x:0, y:0, z:0 };
-        this.rotation = { x:0, y:0, z:0 };
-        this.scale = { x:1, y:1, z:1 };
-        this.parent = null;
-        this.children = [];
-        this.matrix = null;
-        this.matrixWorld = null;
-        this.visible = true;
-        this.userData = {};
-        this.tags = [];           // tambahan layer/tag system
-        this.renderOrder = 0;     // kontrol order rendering
-    }
+  constructor() {
+    this.id = Object3D._id++;
+    this.name = '';
+    this.type = 'Object3D';
 
-    add(child) {
-        this.children.push(child);
-        child.parent = this;
-    }
+    this.position = new Vector3();
+    this.rotation = new Euler();
+    this.quaternion = new Quaternion();
+    this.scale = new Vector3(1,1,1);
 
-    remove(child) {
-        const index = this.children.indexOf(child);
-        if(index >= 0) this.children.splice(index,1);
-        child.parent = null;
-    }
+    this.matrix = new Matrix4();
+    this.matrixWorld = new Matrix4();
 
-    traverse(callback) {
-        callback(this);
-        this.children.forEach(c => c.traverse(callback));
-    }
+    this.children = [];
+    this.parent = null;
 
-    updateMatrix() {
-        // Advanced: compute local matrix from position, rotation, scale
-    }
+    this.matrixAutoUpdate = true;
+    this.visible = true;
 
-    updateMatrixWorld(force=false) {
-        if(force || !this.matrixWorld) {
-            // compute world matrix from parent recursively
-        }
-        this.children.forEach(c => c.updateMatrixWorld(force));
+    this.isObject3D = true;
+
+    // tambahan GLAZE: untuk tagging dan kategori
+    this.tags = new Set();
+  }
+
+  add(object) {
+    if(object.parent) object.parent.remove(object);
+    object.parent = this;
+    this.children.push(object);
+  }
+
+  remove(object) {
+    const index = this.children.indexOf(object);
+    if(index !== -1) {
+      object.parent = null;
+      this.children.splice(index,1);
     }
+  }
+
+  updateMatrix() {
+    this.matrix.compose(this.position, this.quaternion, this.scale);
+  }
+
+  updateMatrixWorld(force=false) {
+    this.updateMatrix();
+    if(this.parent===null) this.matrixWorld.copy(this.matrix);
+    else this.matrixWorld.multiplyMatrices(this.parent.matrixWorld, this.matrix);
+
+    for(const child of this.children) {
+      child.updateMatrixWorld(force);
+    }
+  }
+
+  traverse(callback) {
+    callback(this);
+    for(const child of this.children) child.traverse(callback);
+  }
+
+  clone() {
+    const cloned = new Object3D();
+    cloned.position.copy(this.position);
+    cloned.rotation.copy(this.rotation);
+    cloned.quaternion.copy(this.quaternion);
+    cloned.scale.copy(this.scale);
+    cloned.children = this.children.map(c => c.clone());
+    return cloned;
+  }
 }
+Object3D._id = 0;
