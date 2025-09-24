@@ -1,51 +1,29 @@
+// src/core/scene/Scene.js
 import { Object3D } from './Object3D.js';
 
 export class Scene extends Object3D {
   constructor() {
     super();
-    this.type = 'Scene';
-    this.background = null;      // bisa warna atau texture
-    this.fog = null;             // fog parameters
-    this.autoUpdate = true;      // auto update matrices
-    this.overrideMaterial = null;// jika semua mesh pakai material sama
-    this.children = [];          // list Object3D
+    this.name = 'Scene';
+    this.backgroundColor = [0,0,0,1];
+    this.lights = [];
+    this.meshes = [];
+    this.cameras = [];
   }
 
-  /** Override add untuk memastikan parent-child */
-  add(child) {
-    super.add(child);
+  add(object) {
+    super.add(object);
+    if(object.type === 'Mesh') this.meshes.push(object);
+    if(object.type === 'Camera') this.cameras.push(object);
+    if(object.type === 'Light') this.lights.push(object);
     return this;
   }
 
-  remove(child) {
-    super.remove(child);
+  remove(object) {
+    super.remove(object);
+    if(object.type === 'Mesh') this.meshes = this.meshes.filter(m=>m!==object);
+    if(object.type === 'Camera') this.cameras = this.cameras.filter(c=>c!==object);
+    if(object.type === 'Light') this.lights = this.lights.filter(l=>l!==object);
     return this;
-  }
-
-  /** Update matrices semua anak */
-  updateMatrixWorld(force=false) {
-    if (this.autoUpdate || force) {
-      this.updateMatrix();
-      for (const child of this.children) {
-        child.updateWorldMatrix(this.worldMatrix);
-      }
-    }
-  }
-
-  /** Traverse semua anak, termasuk nested */
-  traverse(callback) {
-    callback(this);
-    for (const child of this.children) {
-      child.traverse(callback);
-    }
-  }
-
-  /** Find object by name */
-  getObjectByName(name) {
-    let result = null;
-    this.traverse(obj => {
-      if (obj.name === name) result = obj;
-    });
-    return result;
   }
 }
