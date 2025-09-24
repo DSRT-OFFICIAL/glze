@@ -1,33 +1,39 @@
-// src/core/scene/Scene.js
-import { Object3D } from './Object3D.js';
+import { Object3D } from '../core/Object3D.js';
 
 export class Scene extends Object3D {
-  constructor() {
-    super();
-    this.type = 'Scene';
-    this.background = null;
-    this.fog = null;
-    this.overrideMaterial = null;
-    this.autoUpdate = true;
-    this.meshes = [];
-    this.lights = [];
-  }
+    constructor() {
+        super();
+        this.background = null;           // Color, Texture, CubeTexture
+        this.fog = null;                  // Fog
+        this.overrideMaterial = null;
+        this.autoUpdate = true;
+        this.matrixWorldAutoUpdate = true;
+        this.lights = [];
+        this.renderQueue = [];
+        this.userData = {};               // Additional custom properties
+    }
 
-  add(...objects) {
-    objects.forEach(o => {
-      super.add(o);
-      if(o.isMesh) this.meshes.push(o);
-      if(o.isLight) this.lights.push(o);
-    });
-    return this;
-  }
+    addLight(light) {
+        this.lights.push(light);
+    }
 
-  remove(...objects) {
-    objects.forEach(o => {
-      super.remove(o);
-      if(o.isMesh) this.meshes = this.meshes.filter(m => m!==o);
-      if(o.isLight) this.lights = this.lights.filter(l => l!==o);
-    });
-    return this;
-  }
+    addToRenderQueue(obj) {
+        this.renderQueue.push(obj);
+    }
+
+    removeFromRenderQueue(obj) {
+        const index = this.renderQueue.indexOf(obj);
+        if(index >= 0) this.renderQueue.splice(index, 1);
+    }
+
+    copy(source, recursive = true) {
+        super.copy(source, recursive);
+        this.background = source.background;
+        this.fog = source.fog;
+        this.overrideMaterial = source.overrideMaterial;
+        this.lights = [...source.lights];
+        this.renderQueue = [...source.renderQueue];
+        this.userData = { ...source.userData };
+        return this;
+    }
 }
