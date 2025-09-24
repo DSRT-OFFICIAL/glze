@@ -4,26 +4,30 @@ import { Object3D } from './Object3D.js';
 export class Scene extends Object3D {
   constructor() {
     super();
-    this.name = 'Scene';
-    this.backgroundColor = [0,0,0,1];
-    this.lights = [];
+    this.type = 'Scene';
+    this.background = null;
+    this.fog = null;
+    this.overrideMaterial = null;
+    this.autoUpdate = true;
     this.meshes = [];
-    this.cameras = [];
+    this.lights = [];
   }
 
-  add(object) {
-    super.add(object);
-    if(object.type === 'Mesh') this.meshes.push(object);
-    if(object.type === 'Camera') this.cameras.push(object);
-    if(object.type === 'Light') this.lights.push(object);
+  add(...objects) {
+    objects.forEach(o => {
+      super.add(o);
+      if(o.isMesh) this.meshes.push(o);
+      if(o.isLight) this.lights.push(o);
+    });
     return this;
   }
 
-  remove(object) {
-    super.remove(object);
-    if(object.type === 'Mesh') this.meshes = this.meshes.filter(m=>m!==object);
-    if(object.type === 'Camera') this.cameras = this.cameras.filter(c=>c!==object);
-    if(object.type === 'Light') this.lights = this.lights.filter(l=>l!==object);
+  remove(...objects) {
+    objects.forEach(o => {
+      super.remove(o);
+      if(o.isMesh) this.meshes = this.meshes.filter(m => m!==o);
+      if(o.isLight) this.lights = this.lights.filter(l => l!==o);
+    });
     return this;
   }
 }
