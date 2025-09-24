@@ -1,46 +1,43 @@
-// src/core/scene/Object3D.js
-import { Vector3 } from '../math/Vector3.js';
-import { Quaternion } from '../math/Quaternion.js';
-import { Matrix4 } from '../math/Matrix4.js';
-
 export class Object3D {
-  constructor(){
-    this.name = '';
-    this.position = new Vector3(0,0,0);
-    this.rotation = new Quaternion(0,0,0,1);
-    this.scale = new Vector3(1,1,1);
-    this.children = [];
-    this.parent = null;
-    this.matrix = new Matrix4();
-    this.worldMatrix = new Matrix4();
-    this.visible = true;
-  }
+    constructor(name='') {
+        this.name = name;
+        this.position = { x:0, y:0, z:0 };
+        this.rotation = { x:0, y:0, z:0 };
+        this.scale = { x:1, y:1, z:1 };
+        this.parent = null;
+        this.children = [];
+        this.matrix = null;
+        this.matrixWorld = null;
+        this.visible = true;
+        this.userData = {};
+        this.tags = [];           // tambahan layer/tag system
+        this.renderOrder = 0;     // kontrol order rendering
+    }
 
-  add(child) {
-    if(child.parent) child.parent.remove(child);
-    child.parent = this;
-    this.children.push(child);
-    return this;
-  }
+    add(child) {
+        this.children.push(child);
+        child.parent = this;
+    }
 
-  remove(child) {
-    const i = this.children.indexOf(child);
-    if(i!==-1){ this.children.splice(i,1); child.parent=null; }
-    return this;
-  }
+    remove(child) {
+        const index = this.children.indexOf(child);
+        if(index >= 0) this.children.splice(index,1);
+        child.parent = null;
+    }
 
-  updateMatrix() {
-    const T = new Matrix4().makeTranslation(this.position.x,this.position.y,this.position.z);
-    const R = new Matrix4().makeRotationFromQuaternion(this.rotation);
-    const S = new Matrix4().makeScale(this.scale.x,this.scale.y,this.scale.z);
-    this.matrix = T.clone().multiply(R).multiply(S);
-    return this;
-  }
+    traverse(callback) {
+        callback(this);
+        this.children.forEach(c => c.traverse(callback));
+    }
 
-  updateWorldMatrix(parentWorld){
-    this.updateMatrix();
-    if(parentWorld) this.worldMatrix = parentWorld.clone().multiply(this.matrix);
-    else this.worldMatrix = this.matrix.clone();
-    for(const c of this.children) c.updateWorldMatrix(this.worldMatrix);
-  }
+    updateMatrix() {
+        // Advanced: compute local matrix from position, rotation, scale
+    }
+
+    updateMatrixWorld(force=false) {
+        if(force || !this.matrixWorld) {
+            // compute world matrix from parent recursively
+        }
+        this.children.forEach(c => c.updateMatrixWorld(force));
+    }
 }
