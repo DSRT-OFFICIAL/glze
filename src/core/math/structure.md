@@ -1,4 +1,4 @@
-# core/math/Structure.md
+# core/math/Structure
 
 The `math/` module contains all mathematical components forming the foundation of the **glze** engine.  
 Focus areas: geometry, linear algebra, interpolation, curves, statistics, and numerical utilities.
