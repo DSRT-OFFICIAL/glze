@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>glze – Math Examples</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #6cf;
+    }
+    .category {
+      margin-bottom: 25px;
+    }
+    .category h2 {
+      color: #ffcc66;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+    }
+    ul {
+      list-style: none;
+      padding-left: 15px;
+    }
+    li {
+      margin: 5px 0;
+    }
+    a {
+      color: #9cf;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 glze – Math Examples</h1>
+  <div id="examples"></div>
+
+  <script>
+    async function loadExamples() {
+      const categories = [
+        "vectors_matrices",
+        "quaternions",
+        "interpolation",
+        "curves",
+        "noise_random",
+        "bounding_collision",
+        "frustum",
+        "color",
+        "statistics_fft",
+        "geometry_shapes"
+      ];
+
+      const container = document.getElementById("examples");
+
+      for (const category of categories) {
+        const res = await fetch(`${category}/`);
+        const text = await res.text();
+
+        // parse isi folder (server harus bisa list directory)
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+        const links = [...doc.querySelectorAll("a")]
+          .map(a => a.getAttribute("href"))
+          .filter(h => h && h.endsWith(".html"));
+
+        if (links.length > 0) {
+          const div = document.createElement("div");
+          div.className = "category";
+          div.innerHTML = `<h2>${category.replace("_", " ")}</h2>`;
+          const ul = document.createElement("ul");
+
+          for (const link of links) {
+            const name = link.replace(".html", "").replace(/_/g, " ");
+            const li = document.createElement("li");
+            li.innerHTML = `<a href="${category}/${link}">${name}</a>`;
+            ul.appendChild(li);
+          }
+
+          div.appendChild(ul);
+          container.appendChild(div);
+        }
+      }
+    }
+
+    loadExamples();
+  </script>
+</body>
+</html>
