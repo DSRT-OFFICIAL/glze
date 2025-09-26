@@ -33,7 +33,7 @@ import { Vector3, Color } from 'glaze/core/math';
 
 Folder Structure
 
-glaze/
+glaze/src/
 ├── animation/
 ├── audio/
 ├── cameras/
@@ -113,7 +113,7 @@ invertColor(c)
 
 Example:
 
-import { BasicColors, ExtendedColors, lerpColors } from 'glaze/core/math/Color';
+import { BasicColors, ExtendedColors, lerpColors } from 'glaze/src/core/math/Color';
 
 const colorA = BasicColors.red;
 const colorB = ExtendedColors.skyBlue;
