@@ -1,3 +1,4 @@
+// glze/src/core/math/Color/ExtendedGlazeColors.js
 import { Color } from './Color.js';
 export const ExtendedColors = {
     ...BasicColors,
