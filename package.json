@@ -1,0 +1,31 @@
+{
+  "name": "glze",
+  "version": "0.1.0",
+  "description": "Glze - Core math and graphics utility library",
+  "main": "src/index.js",
+  "module": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest"
+  },
+  "keywords": [
+    "glze",
+    "math",
+    "3d",
+    "graphics",
+    "engine",
+    "utils"
+  ],
+  "author": "DSRT-OFFICIAL",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DSRT-OFFICIAL/glze.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DSRT-OFFICIAL/glze/issues"
+  },
+  "homepage": "https://github.com/DSRT-OFFICIAL/glze#readme"
+}
