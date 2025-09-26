@@ -1,3 +1,4 @@
+// glze/src/core/math/Primitives/Vector3.js
 export class Vector3 {
     constructor(x = 0, y = 0, z = 0) {
         this.x = x;
@@ -12,15 +13,15 @@ export class Vector3 {
         return this;
     }
 
-    clone() {
-        return new Vector3(this.x, this.y, this.z);
-    }
-
     copy(v) {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
         return this;
+    }
+
+    clone() {
+        return new Vector3(this.x, this.y, this.z);
     }
 
     add(v) {
@@ -30,30 +31,22 @@ export class Vector3 {
         return this;
     }
 
-    sub(v) {
+    subtract(v) {
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
         return this;
     }
 
-    multiplyScalar(scalar) {
-        this.x *= scalar;
-        this.y *= scalar;
-        this.z *= scalar;
+    multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
         return this;
     }
 
-    divideScalar(scalar) {
-        return this.multiplyScalar(1 / scalar);
-    }
-
-    length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
-    }
-
-    normalize() {
-        return this.divideScalar(this.length() || 1);
+    divideScalar(s) {
+        return this.multiplyScalar(1 / s);
     }
 
     dot(v) {
@@ -64,24 +57,27 @@ export class Vector3 {
         const x = this.y * v.z - this.z * v.y;
         const y = this.z * v.x - this.x * v.z;
         const z = this.x * v.y - this.y * v.x;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.x = x; this.y = y; this.z = z;
         return this;
+    }
+
+    length() {
+        return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
+    }
+
+    normalize() {
+        return this.divideScalar(this.length() || 1);
     }
 
     distanceTo(v) {
-        return Math.sqrt((v.x - this.x) ** 2 + (v.y - this.y) ** 2 + (v.z - this.z) ** 2);
+        return Math.sqrt(
+            (v.x - this.x)**2 +
+            (v.y - this.y)**2 +
+            (v.z - this.z)**2
+        );
     }
 
-    toArray() {
-        return [this.x, this.y, this.z];
-    }
-
-    fromArray(arr) {
-        this.x = arr[0];
-        this.y = arr[1];
-        this.z = arr[2];
-        return this;
+    toString() {
+        return `Vector3(${this.x}, ${this.y}, ${this.z})`;
     }
 }
