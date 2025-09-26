@@ -1,66 +1,52 @@
+// glze/src/core/math/Primitives/Quaternion.js
+import { Vector3 } from './Vector3.js';
+
 export class Quaternion {
-    constructor(x=0, y=0, z=0, w=1) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+    constructor(x=0,y=0,z=0,w=1){
+        this.x=x; this.y=y; this.z=z; this.w=w;
     }
 
-    set(x, y, z, w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+    set(x,y,z,w){
+        this.x=x; this.y=y; this.z=z; this.w=w;
         return this;
     }
 
-    clone() {
-        return new Quaternion(this.x, this.y, this.z, this.w);
-    }
-
-    copy(q) {
-        this.x = q.x;
-        this.y = q.y;
-        this.z = q.z;
-        this.w = q.w;
+    copy(q){
+        this.x=q.x; this.y=q.y; this.z=q.z; this.w=q.w;
         return this;
     }
 
-    multiply(q) {
-        const ax=this.x, ay=this.y, az=this.z, aw=this.w;
-        const bx=q.x, by=q.y, bz=q.z, bw=q.w;
+    clone(){
+        return new Quaternion(this.x,this.y,this.z,this.w);
+    }
 
-        this.x = ax*bw + aw*bx + ay*bz - az*by;
-        this.y = ay*bw + aw*by + az*bx - ax*bz;
-        this.z = az*bw + aw*bz + ax*by - ay*bx;
-        this.w = aw*bw - ax*bx - ay*by - az*bz;
+    multiply(q){
+        const x=this.x, y=this.y, z=this.z, w=this.w;
+        const qx=q.x, qy=q.y, qz=q.z, qw=q.w;
+
+        this.x = w*qx + x*qw + y*qz - z*qy;
+        this.y = w*qy - x*qz + y*qw + z*qx;
+        this.z = w*qz + x*qy - y*qx + z*qw;
+        this.w = w*qw - x*qx - y*qy - z*qz;
         return this;
     }
 
-    normalize() {
-        let l = Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
-        if(l===0) { this.x=0; this.y=0; this.z=0; this.w=1; }
-        else { l=1/l; this.x*=l; this.y*=l; this.z*=l; this.w*=l; }
+    normalize(){
+        const l = Math.sqrt(this.x**2 + this.y**2 + this.z**2 + this.w**2);
+        return this.set(this.x/l,this.y/l,this.z/l,this.w/l);
+    }
+
+    setFromAxisAngle(axis, angle){
+        const half = angle/2;
+        const s = Math.sin(half);
+        this.x = axis.x * s;
+        this.y = axis.y * s;
+        this.z = axis.z * s;
+        this.w = Math.cos(half);
         return this;
     }
 
-    setFromEuler(euler) {
-        const c1 = Math.cos(euler.x/2);
-        const c2 = Math.cos(euler.y/2);
-        const c3 = Math.cos(euler.z/2);
-        const s1 = Math.sin(euler.x/2);
-        const s2 = Math.sin(euler.y/2);
-        const s3 = Math.sin(euler.z/2);
-
-        const order = euler.order || 'XYZ';
-
-        if(order==='XYZ') {
-            this.x = s1*c2*c3 + c1*s2*s3;
-            this.y = c1*s2*c3 - s1*c2*s3;
-            this.z = c1*c2*s3 + s1*s2*c3;
-            this.w = c1*c2*c3 - s1*s2*s3;
-        }
-        // Lainnya bisa ditambahkan sesuai order
-        return this;
+    toString(){
+        return `Quaternion(${this.x}, ${this.y}, ${this.z}, ${this.w})`;
     }
-}
+            }
