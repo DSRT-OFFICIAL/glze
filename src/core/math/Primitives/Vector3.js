@@ -31,7 +31,7 @@ export class Vector3 {
         return this;
     }
 
-    sub(v) {
+    subtract(v) {
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
@@ -46,31 +46,11 @@ export class Vector3 {
     }
 
     length() {
-        return Math.hypot(this.x, this.y, this.z);
+        return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
     }
 
     normalize() {
         const len = this.length();
         return len > 0 ? this.multiplyScalar(1 / len) : this;
     }
-
-    dot(v) {
-        return this.x * v.x + this.y * v.y + this.z * v.z;
-    }
-
-    cross(v) {
-        const x = this.y * v.z - this.z * v.y;
-        const y = this.z * v.x - this.x * v.z;
-        const z = this.x * v.y - this.y * v.x;
-        return this.set(x, y, z);
-    }
             }
-            (v.y - this.y)**2 +
-            (v.z - this.z)**2
-        );
-    }
-
-    toString() {
-        return `Vector3(${this.x}, ${this.y}, ${this.z})`;
-    }
-}
