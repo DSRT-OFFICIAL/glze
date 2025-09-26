@@ -1,3 +1,4 @@
+// glze/src/core/math/Primitives/Matrix3.js
 export class Matrix3 {
     constructor() {
         this.elements = [
@@ -7,52 +8,43 @@ export class Matrix3 {
         ];
     }
 
-    set(n11,n12,n13,n21,n22,n23,n31,n32,n33) {
-        const te = this.elements;
-        te[0]=n11; te[1]=n12; te[2]=n13;
-        te[3]=n21; te[4]=n22; te[5]=n23;
-        te[6]=n31; te[7]=n32; te[8]=n33;
+    set(...elements) {
+        this.elements = elements;
         return this;
     }
 
     identity() {
-        this.set(
+        this.elements = [
             1,0,0,
             0,1,0,
             0,0,1
-        );
+        ];
+        return this;
+    }
+
+    multiply(m) {
+        const a = this.elements;
+        const b = m.elements;
+        const r = [];
+        for (let row=0; row<3; row++) {
+            for (let col=0; col<3; col++) {
+                r[row*3+col] = a[row*3+0]*b[0*3+col] +
+                                a[row*3+1]*b[1*3+col] +
+                                a[row*3+2]*b[2*3+col];
+            }
+        }
+        this.elements = r;
         return this;
     }
 
     clone() {
-        const te = this.elements;
-        return new Matrix3().set(...te);
+        const m = new Matrix3();
+        m.elements = [...this.elements];
+        return m;
     }
 
-    copy(m) {
-        const me = m.elements;
-        return this.set(...me);
-    }
-
-    multiplyScalar(scalar) {
-        const te = this.elements;
-        for(let i=0;i<9;i++) te[i]*=scalar;
-        return this;
-    }
-
-    determinant() {
-        const te = this.elements;
-        return te[0]*(te[4]*te[8]-te[5]*te[7])
-             - te[1]*(te[3]*te[8]-te[5]*te[6])
-             + te[2]*(te[3]*te[7]-te[4]*te[6]);
-    }
-
-    transpose() {
-        const te = this.elements;
-        let tmp;
-        tmp=te[1]; te[1]=te[3]; te[3]=tmp;
-        tmp=te[2]; te[2]=te[6]; te[6]=tmp;
-        tmp=te[5]; te[5]=te[7]; te[7]=tmp;
-        return this;
+    toString() {
+        const e = this.elements;
+        return `Matrix3([${e.slice(0,3)}], [${e.slice(3,6)}], [${e.slice(6,9)}])`;
     }
 }
