@@ -1,46 +1,66 @@
+// glze/src/core/math/Matrix2.js
 export class Matrix2 {
-    constructor() {
-        this.elements = [1, 0, 0, 1]; // identity
+    constructor(m00 = 1, m01 = 0, m10 = 0, m11 = 1) {
+        this.m00 = m00; this.m01 = m01;
+        this.m10 = m10; this.m11 = m11;
     }
 
-    set(n11, n12, n21, n22) {
-        const te = this.elements;
-        te[0] = n11; te[1] = n12;
-        te[2] = n21; te[3] = n22;
+    set(m00, m01, m10, m11) {
+        this.m00 = m00; this.m01 = m01;
+        this.m10 = m10; this.m11 = m11;
         return this;
     }
 
     identity() {
-        this.set(1, 0, 0, 1);
+        this.m00 = 1; this.m01 = 0;
+        this.m10 = 0; this.m11 = 1;
+        return this;
+    }
+
+    copy(matrix) {
+        this.m00 = matrix.m00;
+        this.m01 = matrix.m01;
+        this.m10 = matrix.m10;
+        this.m11 = matrix.m11;
         return this;
     }
 
     clone() {
-        const te = this.elements;
-        return new Matrix2().set(te[0], te[1], te[2], te[3]);
+        return new Matrix2(this.m00, this.m01, this.m10, this.m11);
     }
 
-    copy(m) {
-        const me = m.elements;
-        return this.set(me[0], me[1], me[2], me[3]);
-    }
-
-    multiplyScalar(scalar) {
-        const te = this.elements;
-        for (let i = 0; i < 4; i++) te[i] *= scalar;
+    multiply(matrix) {
+        const m00 = this.m00 * matrix.m00 + this.m01 * matrix.m10;
+        const m01 = this.m00 * matrix.m01 + this.m01 * matrix.m11;
+        const m10 = this.m10 * matrix.m00 + this.m11 * matrix.m10;
+        const m11 = this.m10 * matrix.m01 + this.m11 * matrix.m11;
+        this.set(m00, m01, m10, m11);
         return this;
     }
 
     determinant() {
-        const te = this.elements;
-        return te[0] * te[3] - te[1] * te[2];
+        return this.m00 * this.m11 - this.m01 * this.m10;
+    }
+
+    invert() {
+        const det = this.determinant();
+        if (det === 0) return this.identity();
+        const invDet = 1 / det;
+        const m00 = this.m11 * invDet;
+        const m01 = -this.m01 * invDet;
+        const m10 = -this.m10 * invDet;
+        const m11 = this.m00 * invDet;
+        return this.set(m00, m01, m10, m11);
     }
 
     transpose() {
-        const te = this.elements;
-        let tmp = te[1];
-        te[1] = te[2];
-        te[2] = tmp;
+        const tmp = this.m01;
+        this.m01 = this.m10;
+        this.m10 = tmp;
         return this;
     }
-}
+
+    toString() {
+        return `[[${this.m00}, ${this.m01}], [${this.m10}, ${this.m11}]]`;
+    }
+    }
