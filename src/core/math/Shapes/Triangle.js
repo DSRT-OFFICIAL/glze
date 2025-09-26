@@ -1,5 +1,5 @@
 // core/math/Shapes/Triangle.js
-import { Vector3 } from '../primitives/Vector3.js';
+import { Vector3 } from '../Vector3.js';
 
 class Triangle {
     constructor(a = new Vector3(), b = new Vector3(), c = new Vector3()) {
@@ -15,29 +15,8 @@ class Triangle {
         return this;
     }
 
-    getArea() {
-        const v0 = new Vector3().subVectors(this.c, this.b);
-        const v1 = new Vector3().subVectors(this.a, this.b);
-        return v0.cross(v1).length() * 0.5;
-    }
-
-    getNormal(target) {
-        const v0 = new Vector3().subVectors(this.c, this.b);
-        const v1 = new Vector3().subVectors(this.a, this.b);
-        target = target || new Vector3();
-        return target.crossVectors(v0, v1).normalize();
-    }
-
-    containsPoint(point) {
-        const areaABC = this.getArea();
-        const areaPBC = new Triangle(point, this.b, this.c).getArea();
-        const areaAPC = new Triangle(this.a, point, this.c).getArea();
-        const areaABP = new Triangle(this.a, this.b, point).getArea();
-        return Math.abs(areaABC - (areaPBC + areaAPC + areaABP)) < 1e-10;
-    }
-
     clone() {
-        return new Triangle().copy(this);
+        return new Triangle(this.a.clone(), this.b.clone(), this.c.clone());
     }
 
     copy(triangle) {
@@ -45,6 +24,38 @@ class Triangle {
         this.b.copy(triangle.b);
         this.c.copy(triangle.c);
         return this;
+    }
+
+    getArea() {
+        const v0 = this.b.clone().sub(this.a);
+        const v1 = this.c.clone().sub(this.a);
+        return v0.cross(v1).length() * 0.5;
+    }
+
+    getMidpoint(target = new Vector3()) {
+        return target.addVectors(this.a, this.b).add(this.c).multiplyScalar(1 / 3);
+    }
+
+    containsPoint(point) {
+        const v0 = this.c.clone().sub(this.a);
+        const v1 = this.b.clone().sub(this.a);
+        const v2 = point.clone().sub(this.a);
+
+        const dot00 = v0.dot(v0);
+        const dot01 = v0.dot(v1);
+        const dot02 = v0.dot(v2);
+        const dot11 = v1.dot(v1);
+        const dot12 = v1.dot(v2);
+
+        const denom = dot00 * dot11 - dot01 * dot01;
+        const u = (dot11 * dot02 - dot01 * dot12) / denom;
+        const v = (dot00 * dot12 - dot01 * dot02) / denom;
+
+        return (u >= 0) && (v >= 0) && (u + v <= 1);
+    }
+
+    toString() {
+        return `Triangle(a: ${this.a.toArray()}, b: ${this.b.toArray()}, c: ${this.c.toArray()})`;
     }
 }
 
