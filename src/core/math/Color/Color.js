@@ -1,20 +1,54 @@
+// glze/src/core/math/Color/Color.js
 export class Color {
 
-    constructor(value = 0x000000) {
-        this.r = 0;
-        this.g = 0;
-        this.b = 0;
-        this.a = 1.0; // alpha default
-        if (value instanceof Color) {
-            this.copy(value);
-        } else if (typeof value === 'number') {
-            this.setHex(value);
-        } else if (typeof value === 'string') {
-            this.setStyle(value);
+    constructor(r = 1, g = 1, b = 1) {
+        if (typeof r === 'string') {
+            return this.setStyle(r);
+        } else if (r instanceof Color) {
+            return this.copy(r);
         }
+
+        this.r = r;
+        this.g = g;
+        this.b = b;
     }
 
-    // ----- Setters -----
+    // -----------------------
+    // Set & get
+    // -----------------------
+    set(r, g, b) {
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        return this;
+    }
+
+    copy(color) {
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+        return this;
+    }
+
+    clone() {
+        return new Color(this.r, this.g, this.b);
+    }
+
+    // -----------------------
+    // Conversion
+    // -----------------------
+    setHex(hex) {
+        hex = Math.floor(hex);
+        this.r = ((hex >> 16) & 255) / 255;
+        this.g = ((hex >> 8) & 255) / 255;
+        this.b = (hex & 255) / 255;
+        return this;
+    }
+
+    getHex() {
+        return ((this.r * 255) << 16) ^ ((this.g * 255) << 8) ^ (this.b * 255);
+    }
+
     setRGB(r, g, b) {
         this.r = r;
         this.g = g;
@@ -22,110 +56,89 @@ export class Color {
         return this;
     }
 
-    setRGBA(r, g, b, a) {
-        this.setRGB(r, g, b);
-        this.a = a;
-        return this;
-    }
-
-    setHex(hex) {
-        this.r = ((hex >> 16) & 255) / 255;
-        this.g = ((hex >> 8) & 255) / 255;
-        this.b = (hex & 255) / 255;
-        return this;
-    }
-
     setHSL(h, s, l) {
-        // Convert HSL to RGB
-        const c = (1 - Math.abs(2 * l - 1)) * s;
-        const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-        const m = l - c / 2;
-        let r1, g1, b1;
+        h = h % 1; // 0-1
+        s = Math.min(Math.max(s, 0), 1);
+        l = Math.min(Math.max(l, 0), 1);
 
-        if (h < 60) [r1, g1, b1] = [c, x, 0];
-        else if (h < 120) [r1, g1, b1] = [x, c, 0];
-        else if (h < 180) [r1, g1, b1] = [0, c, x];
-        else if (h < 240) [r1, g1, b1] = [0, x, c];
-        else if (h < 300) [r1, g1, b1] = [x, 0, c];
-        else [r1, g1, b1] = [c, 0, x];
+        if (s === 0) {
+            this.r = this.g = this.b = l; // achromatic
+        } else {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
 
-        this.r = r1 + m;
-        this.g = g1 + m;
-        this.b = b1 + m;
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
 
+            this.r = hue2rgb(p, q, h + 1/3);
+            this.g = hue2rgb(p, q, h);
+            this.b = hue2rgb(p, q, h - 1/3);
+        }
         return this;
-    }
-
-    setStyle(style) {
-        if (BasicColors[style]) return this.copy(BasicColors[style]);
-        if (ExtendedColors[style]) return this.copy(ExtendedColors[style]);
-        // fallback hitam
-        return this.setHex(0x000000);
-    }
-
-    // ----- Getters -----
-    getHex() {
-        return ((this.r * 255) << 16) | ((this.g * 255) << 8) | (this.b * 255);
-    }
-
-    getRGB() {
-        return { r: this.r, g: this.g, b: this.b };
-    }
-
-    getRGBA() {
-        return { r: this.r, g: this.g, b: this.b, a: this.a };
     }
 
     getHSL() {
-        const max = Math.max(this.r, this.g, this.b);
-        const min = Math.min(this.r, this.g, this.b);
+        const r = this.r, g = this.g, b = this.b;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
         let h, s;
         const l = (max + min) / 2;
 
         if (max === min) {
-            h = s = 0;
+            h = s = 0; // achromatic
         } else {
             const d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
-                case this.r: h = ((this.g - this.b) / d + (this.g < this.b ? 6 : 0)) * 60; break;
-                case this.g: h = ((this.b - this.r) / d + 2) * 60; break;
-                case this.b: h = ((this.r - this.g) / d + 4) * 60; break;
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
             }
+            h /= 6;
         }
 
         return { h, s, l };
     }
 
-    // ----- Operations -----
-    clone() {
-        return new Color(this);
-    }
+    setStyle(style) {
+        const hexColors = {
+            black: 0x000000,
+            white: 0xffffff,
+            red: 0xff0000,
+            green: 0x00ff00,
+            blue: 0x0000ff,
+            cyan: 0x00ffff,
+            magenta: 0xff00ff,
+            yellow: 0xffff00,
+            orange: 0xff8800,
+            brown: 0x885522,
+            purple: 0x800080,
+            pink: 0xffc0cb,
+            gray: 0x808080
+        };
 
-    copy(color) {
-        this.r = color.r;
-        this.g = color.g;
-        this.b = color.b;
-        this.a = color.a;
+        if (hexColors[style.toLowerCase()]) {
+            this.setHex(hexColors[style.toLowerCase()]);
+        } else if (style.startsWith('#')) {
+            this.setHex(parseInt(style.slice(1), 16));
+        }
+
         return this;
     }
 
-    lerp(color, alpha) {
-        this.r += (color.r - this.r) * alpha;
-        this.g += (color.g - this.g) * alpha;
-        this.b += (color.b - this.b) * alpha;
-        this.a += (color.a - this.a) * alpha;
-        return this;
-    }
-
-    mix(color, alpha) {
-        return this.lerp(color, alpha);
-    }
-
+    // -----------------------
+    // Operations
+    // -----------------------
     add(color) {
-        this.r = Math.min(1, this.r + color.r);
-        this.g = Math.min(1, this.g + color.g);
-        this.b = Math.min(1, this.b + color.b);
+        this.r += color.r;
+        this.g += color.g;
+        this.b += color.b;
         return this;
     }
 
@@ -136,10 +149,22 @@ export class Color {
         return this;
     }
 
-    invert() {
-        this.r = 1 - this.r;
-        this.g = 1 - this.g;
-        this.b = 1 - this.b;
+    lerp(color, alpha) {
+        this.r += (color.r - this.r) * alpha;
+        this.g += (color.g - this.g) * alpha;
+        this.b += (color.b - this.b) * alpha;
         return this;
     }
-}
+
+    mix(color, alpha = 0.5) {
+        return this.lerp(color, alpha);
+    }
+
+    // -----------------------
+    // Utility
+    // -----------------------
+    toString() {
+        return `rgb(${Math.round(this.r*255)}, ${Math.round(this.g*255)}, ${Math.round(this.b*255)})`;
+    }
+
+        }
