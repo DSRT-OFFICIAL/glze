@@ -27,7 +27,7 @@ export class Vector2 {
         return this;
     }
 
-    subtract(v) {
+    sub(v) {
         this.x -= v.x;
         this.y -= v.y;
         return this;
@@ -39,27 +39,16 @@ export class Vector2 {
         return this;
     }
 
-    divideScalar(s) {
-        return this.multiplyScalar(1 / s);
-    }
-
     length() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
+        return Math.hypot(this.x, this.y);
     }
 
     normalize() {
-        return this.divideScalar(this.length() || 1);
+        const len = this.length();
+        return len > 0 ? this.multiplyScalar(1 / len) : this;
     }
 
     dot(v) {
         return this.x * v.x + this.y * v.y;
-    }
-
-    distanceTo(v) {
-        return Math.sqrt((v.x - this.x)**2 + (v.y - this.y)**2);
-    }
-
-    toString() {
-        return `Vector2(${this.x}, ${this.y})`;
     }
 }
