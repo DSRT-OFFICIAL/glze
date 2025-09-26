@@ -1,12 +1,13 @@
 // glze/src/core/math/Primitives/Quaternion.js
-import { Vector3 } from './Vector3.js';
-
 export class Quaternion {
-    constructor(x=0,y=0,z=0,w=1){
-        this.x=x; this.y=y; this.z=z; this.w=w;
+    constructor(x=0, y=0, z=0, w=1){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
     }
 
-    set(x,y,z,w){
+    set(x, y, z, w){
         this.x=x; this.y=y; this.z=z; this.w=w;
         return this;
     }
@@ -28,25 +29,17 @@ export class Quaternion {
         this.y = w*qy - x*qz + y*qw + z*qx;
         this.z = w*qz + x*qy - y*qx + z*qw;
         this.w = w*qw - x*qx - y*qy - z*qz;
+
         return this;
     }
 
     normalize(){
-        const l = Math.sqrt(this.x**2 + this.y**2 + this.z**2 + this.w**2);
-        return this.set(this.x/l,this.y/l,this.z/l,this.w/l);
+        const len = Math.sqrt(this.x*this.x+this.y*this.y+this.z*this.z+this.w*this.w);
+        return len>0 ? this.multiplyScalar(1/len) : this;
     }
 
-    setFromAxisAngle(axis, angle){
-        const half = angle/2;
-        const s = Math.sin(half);
-        this.x = axis.x * s;
-        this.y = axis.y * s;
-        this.z = axis.z * s;
-        this.w = Math.cos(half);
+    multiplyScalar(s){
+        this.x*=s; this.y*=s; this.z*=s; this.w*=s;
         return this;
     }
-
-    toString(){
-        return `Quaternion(${this.x}, ${this.y}, ${this.z}, ${this.w})`;
-    }
-            }
+}
