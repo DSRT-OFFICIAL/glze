@@ -1,6 +1,6 @@
 // glze/src/core/math/Vector4.js
 export class Vector4 {
-    constructor(x = 0, y = 0, z = 0, w = 0) {
+    constructor(x = 0, y = 0, z = 0, w = 1) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -42,17 +42,4 @@ export class Vector4 {
         this.w *= s;
         return this;
     }
-
-    length() {
-        return Math.hypot(this.x, this.y, this.z, this.w);
-    }
-
-    normalize() {
-        const len = this.length();
-        return len > 0 ? this.multiplyScalar(1 / len) : this;
-    }
-
-    dot(v) {
-        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
-    }
-            }
+}
