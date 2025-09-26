@@ -1,3 +1,4 @@
+// glze/src/core/math/Vector4.js
 export class Vector4 {
     constructor(x = 0, y = 0, z = 0, w = 1) {
         this.x = x;
@@ -7,23 +8,12 @@ export class Vector4 {
     }
 
     set(x, y, z, w) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = w;
+        this.x = x; this.y = y; this.z = z; this.w = w;
         return this;
     }
 
     clone() {
         return new Vector4(this.x, this.y, this.z, this.w);
-    }
-
-    copy(v) {
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
-        this.w = v.w;
-        return this;
     }
 
     add(v) {
@@ -34,7 +24,7 @@ export class Vector4 {
         return this;
     }
 
-    sub(v) {
+    subtract(v) {
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
@@ -42,31 +32,31 @@ export class Vector4 {
         return this;
     }
 
-    multiplyScalar(scalar) {
-        this.x *= scalar;
-        this.y *= scalar;
-        this.z *= scalar;
-        this.w *= scalar;
+    multiplyScalar(s) {
+        this.x *= s;
+        this.y *= s;
+        this.z *= s;
+        this.w *= s;
         return this;
     }
 
-    divideScalar(scalar) {
-        return this.multiplyScalar(1 / scalar);
-    }
-
-    dot(v) {
-        return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
-    }
-
-    toArray() {
-        return [this.x, this.y, this.z, this.w];
-    }
-
-    fromArray(arr) {
-        this.x = arr[0];
-        this.y = arr[1];
-        this.z = arr[2];
-        this.w = arr[3];
+    divideScalar(s) {
+        if (s !== 0) {
+            const inv = 1 / s;
+            return this.multiplyScalar(inv);
+        }
         return this;
+    }
+
+    length() {
+        return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z + this.w*this.w);
+    }
+
+    normalize() {
+        return this.divideScalar(this.length() || 1);
+    }
+
+    toString() {
+        return `Vector4(${this.x}, ${this.y}, ${this.z}, ${this.w})`;
     }
 }
