@@ -1,5 +1,5 @@
 // core/math/Shapes/Sphere.js
-import { Vector3 } from '../primitives/Vector3.js';
+import { Vector3 } from '../Vector3.js';
 
 class Sphere {
     constructor(center = new Vector3(), radius = 0) {
@@ -13,15 +13,13 @@ class Sphere {
         return this;
     }
 
-    setFromPoints(points, optionalCenter) {
-        const center = optionalCenter || this.center.set(0,0,0);
-        if (!optionalCenter) points.forEach(p => center.add(p));
-        if (!optionalCenter) center.multiplyScalar(1 / points.length);
+    clone() {
+        return new Sphere(this.center.clone(), this.radius);
+    }
 
-        let maxRadiusSq = 0;
-        points.forEach(p => maxRadiusSq = Math.max(maxRadiusSq, center.distanceToSquared(p)));
-        this.radius = Math.sqrt(maxRadiusSq);
-
+    copy(sphere) {
+        this.center.copy(sphere.center);
+        this.radius = sphere.radius;
         return this;
     }
 
@@ -29,14 +27,36 @@ class Sphere {
         return point.distanceToSquared(this.center) <= (this.radius * this.radius);
     }
 
-    clone() {
-        return new Sphere().copy(this);
+    distanceToPoint(point) {
+        return point.distanceTo(this.center) - this.radius;
     }
 
-    copy(sphere) {
-        this.center.copy(sphere.center);
-        this.radius = sphere.radius;
+    intersectsSphere(sphere) {
+        const radiusSum = this.radius + sphere.radius;
+        return this.center.distanceToSquared(sphere.center) <= (radiusSum * radiusSum);
+    }
+
+    getBoundingBox(targetMin, targetMax) {
+        targetMin.set(
+            this.center.x - this.radius,
+            this.center.y - this.radius,
+            this.center.z - this.radius
+        );
+        targetMax.set(
+            this.center.x + this.radius,
+            this.center.y + this.radius,
+            this.center.z + this.radius
+        );
+        return { min: targetMin, max: targetMax };
+    }
+
+    translate(offset) {
+        this.center.add(offset);
         return this;
+    }
+
+    toString() {
+        return `Sphere(center: ${this.center.toArray()}, radius: ${this.radius})`;
     }
 }
 
