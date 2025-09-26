@@ -1,7 +1,7 @@
 {
   "name": "glze",
   "version": "0.1.0",
-  "description": "Glze - Core math and graphics utility library",
+  "description": "Glze - Graphics Layer Zero Engine library",
   "main": "src/index.js",
   "module": "src/index.js",
   "type": "module",
