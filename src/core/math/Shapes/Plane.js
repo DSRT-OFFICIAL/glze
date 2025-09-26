@@ -1,8 +1,8 @@
 // core/math/Shapes/Plane.js
-import { Vector3 } from '../primitives/Vector3.js';
+import { Vector3 } from '../Vector3.js';
 
 class Plane {
-    constructor(normal = new Vector3(1,0,0), constant = 0) {
+    constructor(normal = new Vector3(1, 0, 0), constant = 0) {
         this.normal = normal;
         this.constant = constant;
     }
@@ -13,9 +13,20 @@ class Plane {
         return this;
     }
 
-    setFromNormalAndPoint(normal, point) {
-        this.normal.copy(normal);
-        this.constant = - point.dot(this.normal);
+    clone() {
+        return new Plane(this.normal.clone(), this.constant);
+    }
+
+    copy(plane) {
+        this.normal.copy(plane.normal);
+        this.constant = plane.constant;
+        return this;
+    }
+
+    normalize() {
+        const inverseNormalLength = 1.0 / this.normal.length();
+        this.normal.multiplyScalar(inverseNormalLength);
+        this.constant *= inverseNormalLength;
         return this;
     }
 
@@ -23,26 +34,23 @@ class Plane {
         return this.normal.dot(point) + this.constant;
     }
 
-    projectPoint(point, target) {
-        const distance = this.distanceToPoint(point);
-        return target.copy(this.normal).multiplyScalar(-distance).add(point);
+    projectPoint(point, target = new Vector3()) {
+        return target.copy(this.normal)
+                     .multiplyScalar(-this.distanceToPoint(point))
+                     .add(point);
     }
 
-    normalize() {
-        const invLength = 1.0 / this.normal.length();
-        this.normal.multiplyScalar(invLength);
-        this.constant *= invLength;
-        return this;
+    intersectLine(line, target = new Vector3()) {
+        const direction = line.delta();
+        const denominator = this.normal.dot(direction);
+        if (denominator === 0) return null;
+        const t = -(line.start.dot(this.normal) + this.constant) / denominator;
+        if (t < 0 || t > 1) return null;
+        return target.copy(direction).multiplyScalar(t).add(line.start);
     }
 
-    clone() {
-        return new Plane().copy(this);
-    }
-
-    copy(plane) {
-        this.normal.copy(plane.normal);
-        this.constant = plane.constant;
-        return this;
+    toString() {
+        return `Plane(normal: ${this.normal.toArray()}, constant: ${this.constant})`;
     }
 }
 
