@@ -27,7 +27,7 @@ export class Vector2 {
         return this;
     }
 
-    sub(v) {
+    subtract(v) {
         this.x -= v.x;
         this.y -= v.y;
         return this;
@@ -40,15 +40,11 @@ export class Vector2 {
     }
 
     length() {
-        return Math.hypot(this.x, this.y);
+        return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
     normalize() {
         const len = this.length();
         return len > 0 ? this.multiplyScalar(1 / len) : this;
-    }
-
-    dot(v) {
-        return this.x * v.x + this.y * v.y;
     }
 }
