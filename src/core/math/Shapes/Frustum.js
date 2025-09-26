@@ -4,7 +4,7 @@ export class Frustum {
   }
 
   setFromMatrix(m) {
-    // implementasi sederhana mirip three.js
+    // implementasi sederhana
     const planes = [];
     for (let i = 0; i < 6; i++) planes[i] = new Plane();
     this.planes = planes;
