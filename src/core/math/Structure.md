@@ -1,4 +1,4 @@
-#Glaze
+#Glaze#
 
 Glaze is a modular JavaScript library for 3D graphics, math utilities, color manipulation, animations, and more. It is inspired by Three.js but designed with its own lightweight and modern structure.
 
