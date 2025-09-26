@@ -11,24 +11,44 @@ class FrustumArray {
         return this;
     }
 
-    remove(index) {
-        this.frustums.splice(index, 1);
+    remove(frustum) {
+        const index = this.frustums.indexOf(frustum);
+        if (index !== -1) this.frustums.splice(index, 1);
         return this;
+    }
+
+    clear() {
+        this.frustums.length = 0;
+        return this;
+    }
+
+    intersectsSphere(sphere) {
+        for (const frustum of this.frustums) {
+            if (frustum.intersectsSphere(sphere)) return true;
+        }
+        return false;
     }
 
     containsPoint(point) {
-        return this.frustums.some(f => f.containsPoint(point));
+        for (const frustum of this.frustums) {
+            if (frustum.containsPoint(point)) return true;
+        }
+        return false;
     }
 
     clone() {
-        const arr = new FrustumArray();
-        this.frustums.forEach(f => arr.add(f.clone()));
-        return arr;
+        const fa = new FrustumArray();
+        fa.frustums = this.frustums.map(f => f.clone());
+        return fa;
     }
 
-    copy(array) {
-        this.frustums = array.frustums.map(f => f.clone());
+    copy(frustumArray) {
+        this.frustums = frustumArray.frustums.map(f => f.clone());
         return this;
+    }
+
+    toString() {
+        return `FrustumArray(frustums: [${this.frustums.map(f => f.toString())}])`;
     }
 }
 
