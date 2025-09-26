@@ -1,31 +1,42 @@
 {
   "name": "glze",
   "version": "0.1.0",
-  "description": "Glze - Graphics Layer Zero Engine library",
-  "main": "src/index.js",
-  "module": "src/index.js",
+  "description": "GLZE - Glazing Lightweight Zero Engine. A modular math, graphics, and simulation library.",
   "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+
+    "./core/math": "./src/core/math/index.js",
+    "./core/animation": "./src/core/animation/index.js",
+    "./core/cameras": "./src/core/cameras/index.js",
+    "./core/geometry": "./src/core/geometry/index.js",
+    "./core/lights": "./src/core/lights/index.js",
+    "./core/loader": "./src/core/loader/index.js",
+    "./core/materials": "./src/core/materials/index.js",
+    "./core/nodes": "./src/core/nodes/index.js",
+    "./core/renderer": "./src/core/renderer/index.js",
+    "./core/scene": "./src/core/scene/index.js",
+    "./core/textures": "./src/core/textures/index.js",
+    "./core/helpers": "./src/core/helpers/index.js",
+
+    "./services": "./src/services/index.js",
+    "./extras": "./src/extras/index.js",
+    "./game": "./src/game/index.js",
+    "./metaverse": "./src/metaverse/index.js"
+  },
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "test": "vitest"
+    "build": "echo \"(opsional: tambahkan bundler/rollup)\"",
+    "test": "echo \"(opsional: setup unit testing)\""
   },
   "keywords": [
     "glze",
     "math",
-    "3d",
     "graphics",
+    "3d",
     "engine",
-    "utils"
+    "glaze"
   ],
   "author": "DSRT-OFFICIAL",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DSRT-OFFICIAL/glze.git"
-  },
-  "bugs": {
-    "url": "https://github.com/DSRT-OFFICIAL/glze/issues"
-  },
-  "homepage": "https://github.com/DSRT-OFFICIAL/glze#readme"
+  "license": "MIT"
 }
