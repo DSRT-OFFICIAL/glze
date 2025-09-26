@@ -1,14 +1,7 @@
 // core/math/Shapes/Box2.js
-
-/**
- * @class Box2
- * @classdesc Represents a 2D axis-aligned bounding box with min and max points.
- */
 import { Vector2 } from '../primitives/Vector2.js';
-import { GlazeMathUtils } from '../GlazeMathUtils.js';
 
 class Box2 {
-
     constructor(min = new Vector2(+Infinity, +Infinity), max = new Vector2(-Infinity, -Infinity)) {
         this.min = min;
         this.max = max;
@@ -23,11 +16,7 @@ class Box2 {
     setFromPoints(points) {
         this.min.set(+Infinity, +Infinity);
         this.max.set(-Infinity, -Infinity);
-
-        points.forEach(point => {
-            this.expandByPoint(point);
-        });
-
+        points.forEach(p => this.expandByPoint(p));
         return this;
     }
 
@@ -54,15 +43,6 @@ class Box2 {
 
     isEmpty() {
         return this.max.x < this.min.x || this.max.y < this.min.y;
-    }
-
-    clampPoint(point, target = new Vector2()) {
-        return target.copy(point).clamp(this.min, this.max);
-    }
-
-    intersectsBox(box) {
-        return !(box.max.x < this.min.x || box.min.x > this.max.x ||
-                 box.max.y < this.min.y || box.min.y > this.max.y);
     }
 
     clone() {
