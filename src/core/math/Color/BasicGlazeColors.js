@@ -1,4 +1,5 @@
-import { Color } from './Color.js';
+// glze/src/core/math/Color/BasicGlazeColor.js
+import { Color } from './BasicGlazeColor.js';
 
 export const BasicColors = {
     black: new Color(0x000000),
